@@ -1,0 +1,14 @@
+on zygote-start
+    write /proc/bootprof "HBT:zygote_hbt-start"
+    start zygote_hbt
+
+# HBT zygote
+service zygote_hbt /system/bin/hbt_translator /system/bin/app_process32 -Xzygote /system/bin --zygote --socket-name=zygote_tertiary
+    class main
+    priority -20
+    user root
+    group root readproc reserved_disk
+    socket zygote_tertiary stream 660 root system
+    socket usap_pool_tertiary stream 660 root system
+    onrestart restart zygote
+    task_profiles ProcessCapacityHigh MaxPerformance
