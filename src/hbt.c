@@ -27,8 +27,8 @@ static long hbt_get_version(struct hbt_abi_version __user *argp)
 
 static long hbt_compat_ioctl(struct hbt_compat_ioctl __user *argp)
 {
-	struct hbt_compat_ioctl args;
-	struct fd f;
+	struct hbt_compat_ioctl args = {};
+	struct fd f = {};
 	struct mm_struct *mm = current->mm;
 
 	if (mmap_read_lock_killable(mm))
@@ -37,14 +37,8 @@ static long hbt_compat_ioctl(struct hbt_compat_ioctl __user *argp)
 	if (mmap_write_lock_killable(mm))
 		return 2;
 
-	if (down_read_killable(&mm->mmap_lock))
-		return 3;
-
-	if (down_write_killable(&mm->mmap_lock))
-		return 4;
-
 	if (security_file_ioctl(f.file, args.cmd, args.arg))
-		return 5;
+		return 3;
 
 	f = fdget(args.fd);
 	if (!f.file)
